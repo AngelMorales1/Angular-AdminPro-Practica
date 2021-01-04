@@ -8,11 +8,14 @@ import { NoPageFoundComponent } from './pages/no-page-found/no-page-found.compon
 
 
 
+
+
+
 const routes: Routes = [
 
   // path: '/dashboard' PagesRouting
-  // path: '/auth' AuthRouting
-
+  // path: '/a uth' AuthRouting
+  {path: '', redirectTo: 'dashboard' , pathMatch: 'full'},
   {path: '**', component: NoPageFoundComponent}
 
 ];
