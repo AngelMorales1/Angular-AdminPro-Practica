@@ -1,3 +1,14 @@
 #cursor{
     cursor: pointer;
 }
+
+.u-img{
+    width: 100% !important;
+    display: flex;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.u-img img{
+    width: 50% !important;
+}

@@ -1,6 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { timeStamp } from 'console';
+import { Usuario } from 'src/app/models/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 declare const gapi: any
 
@@ -10,14 +11,15 @@ declare const gapi: any
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-
+  public usuario: Usuario
   public auth2: any
 
   constructor(private usuarioService: UsuarioService,
               private router : Router,
               private ngZone : NgZone
-    ) { 
+    ) {
       this.googleInit()
+      this.usuario = usuarioService.usuario
   }
 
   googleInit(){

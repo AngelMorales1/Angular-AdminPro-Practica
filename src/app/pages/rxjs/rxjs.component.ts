@@ -8,16 +8,6 @@ import { Observable } from 'rxjs';
 export class RxjsComponent implements OnInit {
 
   constructor() {
-
-    const obs$ = new Observable( observer =>{
-
-      setInterval( ()=>{
-        console.log('tick');
-      },1000 );
-    })
-
-    obs$.subscribe();
-
    }
 
   ngOnInit(): void {

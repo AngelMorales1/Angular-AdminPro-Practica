@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { Router } from '@angular/router';
+import { tap,map, catchError } from 'rxjs/operators';
+
 import { RegisterForm } from '../interfaces/register-form.interface';
 import { LoginForm } from '../interfaces/login-form.interface';
 import { environment } from 'src/environments/environment';
-import { tap,map, catchError } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
-import { Router } from '@angular/router';
-import { promise } from 'protractor';
+import { Usuario } from '../models/usuario.model';
 
 declare const gapi:any
 
@@ -19,24 +20,35 @@ const baseUrl = environment.baseUrl
 export class UsuarioService {
 
   public auth2: any ;
+  public usuario: Usuario
 
   constructor(private http: HttpClient,
               private router: Router,) { 
       this.googleInit();
   }
 
-  validarToken(): Observable<boolean>{
-    const token = localStorage.getItem('token') || '';
+  get token(): string {
+    return localStorage.getItem('token') || '';
+  }
 
+  get uid(): string{
+    return this.usuario.uid || '';
+  }
+
+  validarToken(): Observable<boolean>{
     return this.http.get(`${ baseUrl }/login/renew`,{
       headers: {
-        'x-token': token
+        'x-token': this.token
       }
     }).pipe(
-      tap((resp:any)=>{
+      map((resp:any)=>{
+        const { email, google, nombre,role,img='',_id } = resp.usuarioLogeado;
+
+        this.usuario = new Usuario(nombre,email,'',img, google, role,_id);
+
         localStorage.setItem('token',resp.token);
+        return true;
       }),
-      map(resp => true),
       catchError(error=> of(false))
     )
 
@@ -50,6 +62,21 @@ export class UsuarioService {
                   })
                   )
   }
+
+  actualizarPerfil( data:{email: string, nombre: string, role: string } ){
+
+    data = {
+      ...data,
+      role: this.usuario.role
+    }
+
+    return this.http.put(`${baseUrl}/usuarios/${this.uid}`,data,{
+      headers: {
+        'x-token': this.token
+      }
+    })
+  }
+
 
   login( formData: LoginForm ){
     return this.http.post(`${baseUrl}/login`,formData)
@@ -71,6 +98,7 @@ export class UsuarioService {
           // Request scopes in addition to 'profile' and 'email'
           //scope: 'additional_scope'
         });
+        resolve();
       });
     })
     

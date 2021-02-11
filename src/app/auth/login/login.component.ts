@@ -82,7 +82,6 @@ export class LoginComponent implements OnInit {
               .subscribe(resp=>{
               this.ngZone.run(()=>{
                 this.router.navigateByUrl('/')
-
               })
           });
 
