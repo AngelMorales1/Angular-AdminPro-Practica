@@ -8,6 +8,7 @@ import { RegisterForm } from '../interfaces/register-form.interface';
 import { LoginForm } from '../interfaces/login-form.interface';
 import { environment } from 'src/environments/environment';
 import { Usuario } from '../models/usuario.model';
+import { CargarUsuarios } from '../interfaces/cargar-usuarios.interface';
 
 declare const gapi:any
 
@@ -35,6 +36,14 @@ export class UsuarioService {
     return this.usuario.uid || '';
   }
 
+  get headers(){
+    return {
+      headers:{
+        'x-token':this.token
+      }
+    }
+  }
+  
   validarToken(): Observable<boolean>{
     return this.http.get(`${ baseUrl }/login/renew`,{
       headers: {
@@ -70,11 +79,7 @@ export class UsuarioService {
       role: this.usuario.role
     }
 
-    return this.http.put(`${baseUrl}/usuarios/${this.uid}`,data,{
-      headers: {
-        'x-token': this.token
-      }
-    })
+    return this.http.put(`${baseUrl}/usuarios/${this.uid}`,data,this.headers)
   }
 
 
@@ -118,6 +123,31 @@ export class UsuarioService {
       console.log('User signed out.');
     });
     localStorage.removeItem('token');
+  }
+
+  cargarUsuarios(desde : number = 0){
+    const url = `${baseUrl}/usuarios?desde=${desde}`;
+    return this.http.get<CargarUsuarios>(url, this.headers)
+                .pipe(
+                  map(resp=>{
+                    const usuarios = resp.usuarios.map(
+                      user => new Usuario(user.nombre, user.email,'',user.img,user.google,user.role,user._id)
+                    )
+                    return {total: resp.total,
+                            usuarios
+                    }
+                  })
+                )
+  }
+
+  eliminarUsuario(usuario : Usuario){
+
+    const url = `${baseUrl}/usuarios/${usuario.uid}`
+    return this.http.delete(url, this.headers)
+  }
+
+  guardarUsuario( usuario:Usuario ){
+    return this.http.put(`${baseUrl}/usuarios/${usuario.uid}`,usuario,this.headers)
   }
 
 }

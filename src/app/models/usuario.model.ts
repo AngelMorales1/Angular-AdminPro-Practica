@@ -2,6 +2,7 @@ import { environment } from '../../environments/environment';
 const base_url = environment.baseUrl;
 
 export class Usuario{
+    public _id: string;
 
     constructor(
         public nombre: string,
@@ -15,16 +16,17 @@ export class Usuario{
     ){}
     
     get imagenUrl() {
-        if (this.img.includes('https')) {
-           return this.img
-        }
-
-        if (this.img ) {
+        if (!this.img) {
+            return `${base_url}/upload/usuarios/no-image`
+        }else if (this.img.includes('https')) {
+            return this.img
+        }else if (this.img ) {
             return `${base_url}/upload/usuarios/${this.img}`
-            
         }else{
             return `${base_url}/upload/usuarios/no-image`
         }
+
+        
     }
 
 
